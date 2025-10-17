@@ -19,25 +19,25 @@ public class LoginService {
         System.out.println("VO 에서 서비스로 전달된 비밀번호: " + loginVO.getPassword());
        
      
-        if (loginVO.getEmail().equals(loginDTO.getEmail()) && loginVO.getPassword().equals(loginDTO.getPassword())) {
-            int code = 0;
-            String message = "로그인 성공";
+  
+         // 변수 선언 위치 및 스코프 수정, 로직 정리
+        int code;
+        String message;
 
+        if (loginVO.getEmail().equals(loginDTO.getEmail()) && loginVO.getPassword().equals(loginDTO.getPassword())) {
+            code = 0;
+            message = "로그인 성공";
         } else if (loginVO.getEmail().equals(loginDTO.getEmail()) && !loginVO.getPassword().equals(loginDTO.getPassword())) {
-              int code = 2;
-    String message = "비밀번호 불일치";
+            code = 2;
+            message = "비밀번호 불일치";
+        } else {
+            code = 1;
+            message = "이메일 불일치";
         }
-        else {
-            int code = 1;
-            String message = "이메일 불일치";
-        }
-        
-    
-        }
-      Messenger messenger = new Messenger();
-      messenger.setCode(code);
-      messenger.setMessage(message);
-      return messenger;
-    
-        
+
+        Messenger messenger = new Messenger();
+        messenger.setCode(code);
+        messenger.setMessage(message);
+        return messenger;
     }
+}
