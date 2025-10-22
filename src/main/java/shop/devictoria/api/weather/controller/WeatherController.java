@@ -1,26 +1,28 @@
 package shop.devictoria.api.weather.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-
 import lombok.RequiredArgsConstructor;
-import shop.devictoria.api.common.domain.Messenger;
 import shop.devictoria.api.weather.service.WeatherService;
+import shop.devictoria.api.weather.domain.WeatherDTO;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class WeatherController {
     private final WeatherService weatherService;
 
 @GetMapping("/weather")
-public Messenger getWeather() {
+public String getWeather(Model model) {
     System.out.println("=== WeatherController에서 날씨 데이터 출력 시작 ===");
     
     try {
@@ -31,7 +33,7 @@ public Messenger getWeather() {
         FileReader reader = new FileReader(csvFilePath);
         CSVParser parser = CSVFormat.DEFAULT.parse(reader);
         
-        System.out.println("=== 날씨 데이터 전체 내용 ===");
+        List<WeatherDTO> weatherList = new ArrayList<>();
         
         // 모든 데이터 읽기 (맨 위부터 맨 아래까지)
         boolean isFirstRecord = true;
@@ -41,30 +43,33 @@ public Messenger getWeather() {
                 continue; // 헤더 건너뛰기
             }
             
-            System.out.println("일시: " + record.get(0));
-            System.out.println("평균기온: " + record.get(1) + "℃");
-            System.out.println("최고기온: " + record.get(2) + "℃");
-            System.out.println("최고기온시각: " + record.get(3));
-            System.out.println("최저기온: " + record.get(4) + "℃");
-            System.out.println("최저기온시각: " + record.get(5));
-            System.out.println("일교차: " + record.get(6));
-            System.out.println("강수량: " + record.get(7) + "mm");
-            System.out.println("--------------------------------");
+            WeatherDTO weather = new WeatherDTO();
+            weather.setDate(record.get(0));
+            weather.setTemperature(record.get(1));
+            weather.setMaxTemperature(record.get(2));
+            weather.setMaxTemperatureTime(record.get(3));
+            weather.setMinTemperature(record.get(4));
+            weather.setMinTemperatureTime(record.get(5));
+            weather.setTemperatureDifference(record.get(6));
+            weather.setPrecipitation(record.get(7));
+            
+            weatherList.add(weather);
         }
         
         parser.close();
         reader.close();
         
+        // Model에 데이터 추가
+        model.addAttribute("weatherList", weatherList);
+        
         System.out.println("=== WeatherController에서 날씨 데이터 출력 완료 ===");
         
-        Messenger messenger = weatherService.getWeather();
-        return messenger;
+        return "weather/weatherlist";
         
     } catch (IOException e) {
-        Messenger messenger = new Messenger();
-        messenger.setCode(1);
-        messenger.setMessage("CSV 파일을 읽는 중 오류가 발생했습니다: " + e.getMessage());
-        return messenger;
+        System.err.println("CSV 파일을 읽는 중 오류가 발생했습니다: " + e.getMessage());
+        model.addAttribute("error", "날씨 데이터를 불러오는 중 오류가 발생했습니다.");
+        return "weather/weatherlist";
     }
 }
 }
