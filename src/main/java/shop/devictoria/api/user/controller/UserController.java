@@ -3,7 +3,7 @@ package shop.devictoria.api.user.controller;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class UserController {
 private final UserService userService;
-    @GetMapping("/register")
+    @GetMapping("/users")
     public Messenger printFirstFivePassengers() {
         try {
             // CSV 파일 경로

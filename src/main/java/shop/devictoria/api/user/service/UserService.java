@@ -15,11 +15,13 @@ import jakarta.annotation.PostConstruct;
 public class UserService {
     private final UserRepository userRepository;
 
-    @PostConstruct
-    public void init() {
-        // Service는 단순히 Repository와 연결만 함
-        userRepository.printSamplePassengers();
-    }
+@PostConstruct
+public void init() {
+    System.out.println("=== UserService 초기화 시작 ===");
+    // Service는 단순히 Repository와 연결만 함
+    userRepository.printSamplePassengers();
+    System.out.println("=== UserService 초기화 완료 ===");
+}
 
     public Messenger getFirstFivePassengers(List<UserDTO> users) {
         // TODO Auto-generated method stub
